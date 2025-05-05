@@ -4,25 +4,13 @@ pipeline {
     environment {
         DOCKER_IMAGE = 'yacine78/taskmanager'
         DOCKER_CREDENTIALS = 'credential-dockerhub'
-        SONARQUBE_ENV = 'SonarQubeServer' // Nom du serveur SonarQube dans Jenkins
-        SONARQUBE_TOKEN = credentials('sonarqube-token-id')
+        // KUBE_CONFIG = '/root/.kube/config' // Chemin vers ton fichier kubeconfig
     }
 
     stages {
         stage('Cloner le code') {
             steps {
                 git branch: 'main', url: 'https://github.com/Yacine781/taskmanager.git'
-            }
-        }
-
-        stage('Analyse SonarQube') {
-            steps {
-                withSonarQubeEnv("${SONARQUBE_ENV}") {
-                    sh "sonar-scanner -Dsonar.projectKey=taskmanager \
-                                      -Dsonar.sources=./backend \
-                                      -Dsonar.host.url=$SONAR_HOST_URL \
-                                      -Dsonar.login=$SONARQUBE_TOKEN"
-                }
             }
         }
 
@@ -43,5 +31,14 @@ pipeline {
                 }
             }
         }
+
+        // stage('Déployer sur Kubernetes') {
+        //     steps {
+        //         script {
+        //             sh 'kubectl apply -f k8s/deployment.yaml'
+        //             sh 'kubectl apply -f k8s/service.yaml'
+        //         }
+        //     }
+        // ici}
     }
 }
