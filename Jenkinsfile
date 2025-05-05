@@ -4,8 +4,8 @@ pipeline {
     environment {
         DOCKER_IMAGE = 'yacine78/taskmanager'
         DOCKER_CREDENTIALS = 'credential-dockerhub'
-        SONARQUBE_ENV = 'SonarQubeServer' // Nom du serveur SonarQube dans Jenkins
-        SONARQUBE_TOKEN = credentials('sonarqube-token-id')
+        SONARQUBE_ENV = 'Sonarqube' // Nom du serveur SonarQube dans Jenkins
+        SONARQUBE_TOKEN = credentials('credential-sonarqube')
     }
 
     stages {
