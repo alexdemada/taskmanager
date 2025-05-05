@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DOCKER_IMAGE = 'yacine78/taskmanager'
-        DOCKER_CREDENTIALS = 'taskmanager'
+        DOCKER_CREDENTIALS = 'credential-dockerhub'
         // KUBE_CONFIG = '/root/.kube/config' // Chemin vers ton fichier kubeconfig
     }
 
