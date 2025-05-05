@@ -2,22 +2,22 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = 'dnais1210/edu-keepalive'
-        DOCKER_CREDENTIALS = 'docker-hub-credentials'
+        DOCKER_IMAGE = 'yacine78/taskmanager'
+        DOCKER_CREDENTIALS = 'taskmanager'
         // KUBE_CONFIG = '/root/.kube/config' // Chemin vers ton fichier kubeconfig
     }
 
     stages {
         stage('Cloner le code') {
             steps {
-                git branch: 'main', url: 'https://github.com/ibrahimbakayoko/edu-keepalive.git'
+                git branch: 'main', url: 'https://github.com/Yacine781/taskmanager.git'
             }
         }
 
         stage('Construire l’image Docker') {
             steps {
                 script {
-                    sh 'docker build -t $DOCKER_IMAGE:$BUILD_NUMBER -f eduplateforme/Dockerfile .'
+                    sh 'docker build -t $DOCKER_IMAGE:$BUILD_NUMBER -f backend/Dockerfile .'
                 }
             }
         }
