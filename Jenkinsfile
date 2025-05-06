@@ -63,10 +63,8 @@ pipeline {
     post {
         always {
             // Enrouler le bloc 'junit' dans un bloc 'node' pour résoudre le problème de contexte
-            node {
-                script {
-                    junit 'backend/test-results/results.xml'
-                }
+            script {
+                junit 'backend/test-results/results.xml'
             }
         }
     }
