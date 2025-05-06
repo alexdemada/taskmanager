@@ -4,8 +4,9 @@ pipeline {
     environment {
         DOCKER_IMAGE = 'yacine78/taskmanager'
         DOCKER_CREDENTIALS = 'credential-dockerhub'
-        SONARQUBE_ENV = 'SonarQubeServer'
-        SONARQUBE_TOKEN = credentials('sonarqube-token-id')
+        SONARQUBE_ENV = 'Sonarqube'
+        SONARQUBE_TOKEN = credentials('credential-sonarqube')
+        SONAR_HOST_URL = 'http://192.168.27.66:9000/' // Ajoute l'URL de ton serveur SonarQube
     }
 
     stages {
@@ -61,9 +62,11 @@ pipeline {
 
     post {
         always {
-            script {
-                // Ce bloc doit être dans "script" et dans "post"
-                junit 'backend/test-results/results.xml'
+            // Enrouler le bloc 'junit' dans un bloc 'node' pour résoudre le problème de contexte
+            node {
+                script {
+                    junit 'backend/test-results/results.xml'
+                }
             }
         }
     }
