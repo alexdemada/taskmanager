@@ -4,8 +4,8 @@ pipeline {
     environment {
         DOCKER_IMAGE = 'yacine78/taskmanager'
         DOCKER_CREDENTIALS = 'credential-dockerhub'
-        SONARQUBE_ENV = 'Sonarqube' // Nom du serveur SonarQube dans Jenkins
-        SONARQUBE_TOKEN = credentials('credential-sonarqube')
+        SONARQUBE_ENV = 'SonarQubeServer'
+        SONARQUBE_TOKEN = credentials('sonarqube-token-id')
     }
 
     stages {
@@ -15,13 +15,32 @@ pipeline {
             }
         }
 
+        stage('Tests & couverture') {
+            steps {
+                dir('backend') {
+                    // Installation des dépendances
+                    sh 'npm install'
+
+                    // Exécution des tests + génération du rapport JUnit
+                    sh 'npx nyc mocha --reporter mocha-junit-reporter --reporter-options mochaFile=./test-results/results.xml'
+
+                    // Génération du rapport de couverture au format lcov
+                    sh 'npx nyc report --reporter=text-lcov > coverage.lcov'
+                }
+            }
+        }
+
         stage('Analyse SonarQube') {
             steps {
                 withSonarQubeEnv("${SONARQUBE_ENV}") {
-                    sh "sonar-scanner -Dsonar.projectKey=taskmanager \
-                                      -Dsonar.sources=./backend \
-                                      -Dsonar.host.url=$SONAR_HOST_URL \
-                                      -Dsonar.login=$SONARQUBE_TOKEN"
+                    sh """
+                        sonar-scanner \
+                        -Dsonar.projectKey=taskmanager \
+                        -Dsonar.sources=./backend \
+                        -Dsonar.javascript.lcov.reportPaths=./backend/coverage.lcov \
+                        -Dsonar.host.url=$SONAR_HOST_URL \
+                        -Dsonar.login=$SONARQUBE_TOKEN
+                    """
                 }
             }
         }
@@ -42,6 +61,13 @@ pipeline {
                     }
                 }
             }
+        }
+    }
+
+    post {
+        always {
+            // Publication du rapport de test JUnit
+            junit 'backend/test-results/results.xml'
         }
     }
 }
