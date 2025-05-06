@@ -18,13 +18,8 @@ pipeline {
         stage('Tests & couverture') {
             steps {
                 dir('backend') {
-                    // Installation des dépendances
                     sh 'npm install'
-
-                    // Exécution des tests + génération du rapport JUnit
                     sh 'npx nyc mocha --reporter mocha-junit-reporter --reporter-options mochaFile=./test-results/results.xml'
-
-                    // Génération du rapport de couverture au format lcov
                     sh 'npx nyc report --reporter=text-lcov > coverage.lcov'
                 }
             }
@@ -66,8 +61,10 @@ pipeline {
 
     post {
         always {
-            // Publication du rapport de test JUnit
-            junit 'backend/test-results/results.xml'
+            script {
+                // Ce bloc doit être dans "script" et dans "post"
+                junit 'backend/test-results/results.xml'
+            }
         }
     }
 }
