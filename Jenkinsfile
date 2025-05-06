@@ -20,7 +20,8 @@ pipeline {
             steps {
                 dir('backend') {
                     sh 'npm install'
-                    sh 'npx nyc mocha --reporter mocha-junit-reporter --reporter-options mochaFile=./test-results/results.xml'
+                    // Lancer le test logique basique
+                    sh 'npx mocha backend/test/basic.test.js --reporter mocha-junit-reporter --reporter-options mochaFile=./test-results/results.xml'
                     sh 'npx nyc report --reporter=text-lcov > coverage.lcov'
                 }
             }
@@ -62,8 +63,8 @@ pipeline {
 
     post {
         always {
-            // Enrouler le bloc 'junit' dans un bloc 'node' pour résoudre le problème de contexte
             script {
+                // Ce bloc doit être dans "script" et dans "post"
                 junit 'backend/test-results/results.xml'
             }
         }
