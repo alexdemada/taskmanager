@@ -18,7 +18,8 @@ pipeline {
 
         stage('Tests & couverture') {
             steps {
-                dir('backend') {
+                dir('backend') { 
+                    sh 'cd backend'
                     sh 'npm install'
                     // Lancer le test logique basique
                     sh 'npx mocha backend/test/basic.test.js --reporter mocha-junit-reporter --reporter-options mochaFile=./test-results/results.xml'
