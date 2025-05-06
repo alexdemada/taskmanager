@@ -1,5 +1,7 @@
 // backend/test/basic.test.js
-const assert = require('assert');
+// const assert = require('assert');
+
+import assert from 'assert';
 
 describe('Test logique de base', function() {
   it('devrait valider que 1 + 1 égale 2', function() {
