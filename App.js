@@ -12,8 +12,8 @@ import {
 import { StatusBar } from "expo-status-bar";
 
 // Définir les URLs possibles (conservé tel quel)
-const webApiUrl = "http://localhost:5000/api"; // Pour le web (et simulateur iOS)
-const androidApiUrl = "http://10.0.2.2:5000/api"; // Pour l'émulateur Android
+const webApiUrl = "http://localhost:3000/api"; // Pour le web (et simulateur iOS)
+const androidApiUrl = "http://10.0.2.2:3000/api"; // Pour l'émulateur Android
 // Pour un appareil physique (iOS ou Android), vous auriez besoin de l'IP locale de votre PC sur le réseau WiFi
 // const physicalDeviceApiUrl = 'http://192.168.X.X:5000/api';
 
