@@ -14,7 +14,7 @@ RUN npm install
 COPY . .
 
 # Exposer le port 5000 pour l'API
-EXPOSE 3000
+EXPOSE 5000
 
 # Commande pour démarrer l'application
 CMD ["npm", "start"]
