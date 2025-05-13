@@ -6,7 +6,7 @@ pipeline {
         DOCKER_CREDENTIALS = 'credential-dockerhub'
         SONARQUBE_ENV = 'Sonarqube'
         SONARQUBE_TOKEN = credentials('credential-sonarqube')
-        SONAR_HOST_URL = 'http://192.168.27.66:9000/' // Ajoute l'URL de ton serveur SonarQube
+        SONAR_HOST_URL = 'http://192.168.27.66:9000/'
     }
 
     stages {
@@ -19,13 +19,8 @@ pipeline {
         stage('Tests & couverture') {
             steps {
                 dir('backend') {
-                    // Installer les dépendances dans le dossier backend
                     sh 'npm install'
-                    
-                    // Lancer les tests avec Mocha en spécifiant un chemin correct
                     sh 'npx mocha ./test/basic.test.js --reporter mocha-junit-reporter --reporter-options mochaFile=./test-results/results.xml'
-
-                    // Générer le rapport de couverture avec NYC
                     sh 'npx nyc report --reporter=text-lcov > coverage.lcov'
                 }
             }
@@ -49,7 +44,9 @@ pipeline {
         stage('Construire l’image Docker') {
             steps {
                 script {
-                    sh 'docker build -t $DOCKER_IMAGE:$BUILD_NUMBER -f backend/Dockerfile .'
+                    sh """
+                        docker build -t $DOCKER_IMAGE:$BUILD_NUMBER -t $DOCKER_IMAGE:latest backend/
+                    """
                 }
             }
         }
@@ -58,7 +55,10 @@ pipeline {
             steps {
                 script {
                     withDockerRegistry([credentialsId: "$DOCKER_CREDENTIALS", url: ""]) {
-                        sh 'docker push $DOCKER_IMAGE:$BUILD_NUMBER'
+                        sh """
+                            docker push $DOCKER_IMAGE:$BUILD_NUMBER
+                            docker push $DOCKER_IMAGE:latest
+                        """
                     }
                 }
             }
@@ -68,7 +68,6 @@ pipeline {
     post {
         always {
             script {
-                // Enregistrer les résultats des tests JUnit
                 junit 'backend/test-results/results.xml'
             }
         }
