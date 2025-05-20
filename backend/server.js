@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import client from "prom-client"; // <-- Ajout Prometheus client
 
 // Importer les routes
 import authRoutes from "./routes/authRoutes.js";
@@ -13,26 +14,48 @@ import settingsRoutes from "./routes/settingsRoutes.js";
 dotenv.config();
 const app = express();
 
-// --- DEBUT Configuration CORS Explicite ---
+// --- DEBUT Configuration Prometheus ---
+client.collectDefaultMetrics(); // collecte CPU, mémoire, etc.
 
+// Créer un compteur personnalisé
+const httpRequestCounter = new client.Counter({
+  name: "http_requests_total",
+  help: "Nombre total de requêtes HTTP",
+  labelNames: ["method", "route", "status"]
+});
+
+// Middleware pour compter les requêtes
+app.use((req, res, next) => {
+  res.on("finish", () => {
+    httpRequestCounter.inc({
+      method: req.method,
+      route: req.route?.path || req.path,
+      status: res.statusCode
+    });
+  });
+  next();
+});
+
+// Route /metrics pour Prometheus
+app.get("/metrics", async (req, res) => {
+  res.set("Content-Type", client.register.contentType);
+  res.end(await client.register.metrics());
+});
+// --- FIN Configuration Prometheus ---
+
+// --- DEBUT Configuration CORS ---
 const corsOptions = {
-  // Pour le développement, '*' est souvent plus simple, mais moins sécurisé.
-  // En production, mettez l'URL exacte de votre frontend.
-  // Pour Expo Web local (souvent port 8081):
-  origin: ["http://localhost:8081", "http://127.0.0.1:8081", "*"], // Permet localhost, 127.0.0.1 et toutes origines (*)
-  methods: "GET,HEAD,PUT,PATCH,POST,DELETE", // Méthodes autorisées
-  allowedHeaders: ["Content-Type", "Authorization"], // En-têtes autorisés (IMPORTANT pour JSON et JWT)
-  credentials: true, // Si vous utilisez des cookies/sessions un jour
-  optionsSuccessStatus: 204, // Pour les requêtes OPTIONS (preflight)
+  origin: ["http://localhost:8081", "http://127.0.0.1:8081", "*"],
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
+  optionsSuccessStatus: 204,
 };
 
-// IMPORTANT: Gérer les requêtes preflight OPTIONS *avant* les autres routes
 app.options("*", cors(corsOptions));
-
-// Appliquer CORS avec les options à toutes les requêtes suivantes
 app.use(cors(corsOptions));
+// --- FIN Configuration CORS ---
 
-// --- FIN Configuration CORS Explicite ---
 app.use(express.json());
 
 // Utilisation des routes
@@ -42,12 +65,12 @@ app.use("/api/appointments", appointmentRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/settings", settingsRoutes);
 
-// Définir une route pour la page d'accueil
+// Route d'accueil
 app.get("/", (req, res) => {
   res.send("API fonctionnelle");
 });
 
-// Définir le port d'écoute du serveur
+// Port d'écoute
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Serveur démarré sur le port ${PORT}`);
