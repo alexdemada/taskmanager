@@ -66,7 +66,7 @@ pipeline {
         
         stage('Déploiement Backend') {
             steps {
-                script {
+                withEnv(["KUBECONFIG=/var/lib/jenkins/.kube/config"]) {
                     sh """
                         helm upgrade --install taskmanager-backend-k3s /home/taskmanager-backend-k3s \
                             --set image.repository=$DOCKER_IMAGE \
