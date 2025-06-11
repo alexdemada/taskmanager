@@ -64,18 +64,18 @@ pipeline {
             }
         }
         
-        stage('Déploiement Backend') {
-            steps {
-                withEnv(["KUBECONFIG=/var/lib/jenkins/.kube/config"]) {
-                    sh """
-                        helm upgrade --install taskmanager-backend-k3s /home/taskmanager-backend-k3s \
-                            --set image.repository=$DOCKER_IMAGE \
-                            --set image.tag=$BUILD_NUMBER \
-                            -n taskmanager --create-namespace
-                    """
-                }
-            }
-        }
+        // stage('Déploiement Backend') {
+        //     steps {
+        //         withEnv(["KUBECONFIG=/var/lib/jenkins/.kube/config"]) {
+        //             sh """
+        //                 helm upgrade --install taskmanager-backend-k3s /home/taskmanager-backend-k3s \
+        //                     --set image.repository=$DOCKER_IMAGE \
+        //                     --set image.tag=$BUILD_NUMBER \
+        //                     -n taskmanager --create-namespace
+        //             """
+        //         }
+        //     }
+        // }
     }
 
     post {
