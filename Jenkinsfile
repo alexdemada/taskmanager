@@ -16,30 +16,30 @@ pipeline {
             }
         }
 
-       // stage('Tests & couverture') {
-       //  steps {
-        //    dir('backend') {
-          //      sh 'npm install'  
-            //    sh 'npx mocha ./test/basic.test.js --reporter mocha-junit-reporter --reporter-options mochaFile=./test-results/results.xml'
-                //  sh 'npx nyc report --reporter=text-lcov > coverage.lcov'
-    //            }
-      //      }
-       // }
+       stage('Tests & couverture') {
+        steps {
+           dir('backend') {
+               sh 'npm install'  
+               sh 'npx mocha ./test/basic.test.js --reporter mocha-junit-reporter --reporter-options mochaFile=./test-results/results.xml'
+                 sh 'npx nyc report --reporter=text-lcov > coverage.lcov'
+               }
+           }
+       }
 
-       // stage('Analyse SonarQube') {
-       //     steps {
-         //       withSonarQubeEnv("${SONARQUBE_ENV}") {
-         //           sh """
-           //             sonar-scanner \
-             //           -Dsonar.projectKey=taskmanager \
-               //         -Dsonar.sources=./backend \
-                 //       -Dsonar.javascript.lcov.reportPaths=./backend/coverage.lcov \
-                   //     -Dsonar.host.url=$SONAR_HOST_URL \
-                     //   -Dsonar.login=$SONARQUBE_TOKEN
-                 //   """
-              //  }
-           // }
-      //  }
+       stage('Analyse SonarQube') {
+           steps {
+               withSonarQubeEnv("${SONARQUBE_ENV}") {
+                   sh """
+                       sonar-scanner \
+                       -Dsonar.projectKey=taskmanager \
+                       -Dsonar.sources=./backend \
+                       -Dsonar.javascript.lcov.reportPaths=./backend/coverage.lcov \
+                       -Dsonar.host.url=$SONAR_HOST_URL \
+                       -Dsonar.login=$SONARQUBE_TOKEN
+                   """
+               }
+           }
+       }
 
         stage('Construire l’image Docker') {
             steps {
@@ -64,18 +64,18 @@ pipeline {
             }
         }
         
-        // stage('Déploiement Backend') {
-        //     steps {
-        //         withEnv(["KUBECONFIG=/var/lib/jenkins/.kube/config"]) {
-        //             sh """
-        //                 helm upgrade --install taskmanager-backend-k3s /home/taskmanager-backend-k3s \
-        //                     --set image.repository=$DOCKER_IMAGE \
-        //                     --set image.tag=$BUILD_NUMBER \
-        //                     -n taskmanager --create-namespace
-        //             """
-        //         }
-        //     }
-        // }
+        stage('Déploiement Backend') {
+            steps {
+                withEnv(["KUBECONFIG=/var/lib/jenkins/.kube/config"]) {
+                    sh """
+                        helm upgrade --install taskmanager-backend-k3s /home/taskmanager-backend-k3s \
+                            --set image.repository=$DOCKER_IMAGE \
+                            --set image.tag=$BUILD_NUMBER \
+                            -n taskmanager --create-namespace
+                    """
+                }
+            }
+        }
     }
 
     post {
