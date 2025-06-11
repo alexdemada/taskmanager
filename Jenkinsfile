@@ -1,18 +1,18 @@
-pipeline {
+0pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = 'yacine78/taskmanager'
+        DOCKER_IMAGE = 'alexjrc972/taskmanager'
         DOCKER_CREDENTIALS = 'credential-dockerhub'
         SONARQUBE_ENV = 'Sonarqube'
         SONARQUBE_TOKEN = credentials('credential-sonarqube')
-        SONAR_HOST_URL = 'http://192.168.27.66:9000/'
+        SONAR_HOST_URL = 'http://192.168.27.28:9000/'
     }
 
     stages {
         stage('Cloner le code') {
             steps {
-                git branch: 'main', url: 'https://github.com/Yacine781/taskmanager.git'
+                git branch: 'main', url: 'https://github.com/alexdemada/taskmanager.git'
             }
         }
 
