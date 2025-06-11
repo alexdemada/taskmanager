@@ -13,7 +13,7 @@ pipeline {
     stages {
         stage('Cloner le code') {
             steps {
-                git branch: 'main', url: https://github.com/alexdemada/taskmanager.git'
+                git branch: 'main', url: https: 'https://github.com/alexdemada/taskmanager.git'
             }
         }
 
