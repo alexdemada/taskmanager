@@ -2,18 +2,18 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = 'dnais1210/taskshare'
-        DOCKER_CREDENTIALS = 'dockerhub-taskshare'
+        DOCKER_IMAGE = 'alexjrc972/taskshare'
+        DOCKER_CREDENTIALS = 'credential-dockerhub'
         SONARQUBE_ENV = 'SonarQube'
-        SONARQUBE_TOKEN = credentials('taskshare-token')
-        SONAR_HOST_URL = 'http://192.168.27.21:9000/'
+        SONARQUBE_TOKEN = 'credential-sonarqube'
+        SONAR_HOST_URL = 'http://192.168.27.28:9000/'
         KUBECONFIG_PATH = '/var/lib/jenkins/.kube/config'
     }
 
     stages {
         stage('Cloner le code') {
             steps {
-                git branch: 'main', url: 'https://github.com/ibrahimbakayoko/taskshare-app.git'
+                git branch: 'main', url: 'https://github.com/alexdemada/taskmanager.git'
             }
         }
 
@@ -64,7 +64,7 @@ pipeline {
             steps {
                 withEnv(["KUBECONFIG=$KUBECONFIG_PATH"]) {
                     sh """
-                        helm upgrade --install taskshare-backend /home/taskshare-backend/taskshare-backend \
+                        helm upgrade --install taskmanager-backend /home/taskmanager-backend/taskmanager-backend \
                             --set image.repository=$DOCKER_IMAGE \
                             --set image.tag=$BUILD_NUMBER \
                             -n test --create-namespace
@@ -92,7 +92,7 @@ pipeline {
         DOCKER_IMAGE = 'alexjrc972/taskshare'
         DOCKER_CREDENTIALS = 'credential-dockerhub'
         SONARQUBE_ENV = 'SonarQube'
-        SONARQUBE_TOKEN = credential-sonarqube
+        SONARQUBE_TOKEN = 'credential-sonarqube'
         SONAR_HOST_URL = 'http://192.168.27.28:9000/'
         KUBECONFIG_PATH = '/var/lib/jenkins/.kube/config'
     }
