@@ -4,10 +4,10 @@ pipeline {
     environment {
         DOCKER_IMAGE = 'alexjrc972/taskshare'
         DOCKER_CREDENTIALS = 'credential-dockerhub'
-        SONARQUBE_ENV = 'Sonarqube'
-        SONARQUBE_TOKEN = 'credential-sonarqube'
+        SONARQUBE_ENV = 'SonarQube'
         SONAR_HOST_URL = 'http://192.168.27.28:9000/'
         KUBECONFIG_PATH = '/var/lib/jenkins/.kube/config'
+        // Note : On ne met pas SONARQUBE_TOKEN ici car on l'injecte via withCredentials
     }
 
     stages {
@@ -28,15 +28,17 @@ pipeline {
 
         stage('Analyse SonarQube') {
             steps {
-                withSonarQubeEnv("${SONARQUBE_ENV}") {
-                    sh """
-                        sonar-scanner \
-                        -Dsonar.projectKey=taskmanager \
-                        -Dsonar.sources=./backend \
-                        -Dsonar.javascript.lcov.reportPaths=./backend/coverage/lcov.info \
-                        -Dsonar.host.url=${SONAR_HOST_URL} \
-                        -Dsonar.login=${SONARQUBE_TOKEN}
-                    """
+                withCredentials([string(credentialsId: 'credential-sonarqube', variable: 'SONARQUBE_TOKEN')]) {
+                    withSonarQubeEnv("${SONARQUBE_ENV}") {
+                        sh """
+                            sonar-scanner \
+                            -Dsonar.projectKey=taskmanager \
+                            -Dsonar.sources=./backend \
+                            -Dsonar.javascript.lcov.reportPaths=./backend/coverage/lcov.info \
+                            -Dsonar.host.url=${SONAR_HOST_URL} \
+                            -Dsonar.login=${SONARQUBE_TOKEN}
+                        """
+                    }
                 }
             }
         }
