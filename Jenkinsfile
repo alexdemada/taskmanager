@@ -66,7 +66,7 @@ pipeline {
             steps {
                 withEnv(["KUBECONFIG=$KUBECONFIG_PATH"]) {
                     sh """
-                        helm upgrade --install taskmanager-backend /home/taskmanager-backend/taskmanager-backend \
+                        helm upgrade --install taskmanager-backend /var/lib/jenkins/taskmanager-backend-k3s \
                             --set image.repository=$DOCKER_IMAGE \
                             --set image.tag=$BUILD_NUMBER \
                             -n test --create-namespace
@@ -85,7 +85,7 @@ pipeline {
             steps {
                 withEnv(["KUBECONFIG=$KUBECONFIG_PATH"]) {
                     sh """
-                        helm upgrade --install taskmanager-backend /home/taskmanager-backend/taskmanager-backend \
+                        helm upgrade --install taskmanager-backend /var/lib/jenkins/taskmanager-backend-k3s \
                             --set image.repository=$DOCKER_IMAGE \
                             --set image.tag=$BUILD_NUMBER \
                             -n taskmanager --create-namespace
