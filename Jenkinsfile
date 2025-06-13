@@ -4,7 +4,7 @@ pipeline {
     environment {
         DOCKER_IMAGE = 'alexjrc972/taskshare'
         DOCKER_CREDENTIALS = 'credential-dockerhub'
-        SONARQUBE_ENV = 'SonarQube'
+        SONARQUBE_ENV = 'Sonarqube'
         SONAR_HOST_URL = 'http://192.168.27.28:9000/'
         KUBECONFIG_PATH = '/var/lib/jenkins/.kube/config'
         // Note : On ne met pas SONARQUBE_TOKEN ici car on l'injecte via withCredentials
