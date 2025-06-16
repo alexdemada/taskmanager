@@ -1,4 +1,4 @@
-pipeline {
+0pipeline {
     agent any
 
     environment {
@@ -45,4 +45,44 @@ pipeline {
             steps {
                 script {
                     sh """
-                        docker build -t $DOCKER
+                        docker build -t $DOCKER_IMAGE:$BUILD_NUMBER -t $DOCKER_IMAGE:latest backend/
+                    """
+                }
+            }
+        }
+
+        stage('Pousser sur Docker Hub') {
+            steps {
+                script {
+                    withDockerRegistry([credentialsId: "$DOCKER_CREDENTIALS", url: ""]) {
+                        sh """
+                            docker push $DOCKER_IMAGE:$BUILD_NUMBER
+                            docker push $DOCKER_IMAGE:latest
+                        """
+                    }
+                }
+            }
+        }
+        
+        stage('Déploiement Backend') {
+            steps {
+                withEnv(["KUBECONFIG=/var/lib/jenkins/.kube/config"]) {
+                    sh """
+                        helm upgrade --install taskmanager-backend-k3s /home/taskmanager-backend-k3s \
+                            --set image.repository=$DOCKER_IMAGE \
+                            --set image.tag=$BUILD_NUMBER \
+                            -n taskmanager --create-namespace
+                    """
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            script {
+                junit 'backend/test-results/results.xml'
+            }
+        }
+    }
+}
