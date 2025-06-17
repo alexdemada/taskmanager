@@ -30,11 +30,11 @@ pipeline {
             steps {
                 withSonarQubeEnv("${SONARQUBE_ENV}") {
                     sh """
-                        sonar-scanner \
-                        -Dsonar.projectKey=taskmanager \
-                        -Dsonar.sources=./backend \
-                        -Dsonar.javascript.lcov.reportPaths=./backend/coverage.lcov \
-                        -Dsonar.host.url=$SONAR_HOST_URL \
+                        sonar-scanner \\
+                        -Dsonar.projectKey=taskmanager \\
+                        -Dsonar.sources=./backend \\
+                        -Dsonar.javascript.lcov.reportPaths=./backend/coverage.lcov \\
+                        -Dsonar.host.url=$SONAR_HOST_URL \\
                         -Dsonar.login=$SONARQUBE_TOKEN
                     """
                 }
@@ -63,14 +63,14 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Déploiement Backend') {
             steps {
                 withEnv(["KUBECONFIG=/var/lib/jenkins/.kube/config"]) {
                     sh """
-                        helm upgrade --install taskmanager-backend-k3s C:\Users\stagiaire\Desktop\taskmanager-backend-k3s \
-                            --set image.repository=$DOCKER_IMAGE \
-                            --set image.tag=$BUILD_NUMBER \
+                        helm upgrade --install taskmanager-backend-k3s C:\\\\Users\\\\stagiaire\\\\Desktop\\\\taskmanager-backend-k3s \\
+                            --set image.repository=$DOCKER_IMAGE \\
+                            --set image.tag=$BUILD_NUMBER \\
                             -n taskmanager --create-namespace
                     """
                 }
